@@ -20,6 +20,32 @@ The one I possess is:
 * selenium-client -1.2.18
 * rails - 3.0.0
 
+### Ruby and Gem Versions I use in [Getting Started with Rspec and Cucumebr]()
+
+* `$ $ ruby -v` = ruby 2.4.1p111 (2017-03-22 revision 58053) [x86_64-darwin17]
+* `$  gem --version` = 2.6.14
+* `$ rvm rubygems current` = Rubygems 2.6.14 already available in installed ruby, skipping installation, use --force to reinstall.
+* `$ rspec -v` =
+  * RSpec 3.7
+    - rspec-core 3.7.1
+    - rspec-expectations 3.7.0
+    - rspec-mocks 3.7.0
+    - rspec-support 3.7.1
+* `$ rspec-rails -v` = -bash: rspec-rails: command not found
+* `$ gem list` = cucumber (3.1.0)
+* `$ cucumber-rails -v` = -bash: cucumber-rails: command not found
+* `$ database_cleaner -v` = -bash: database_cleaner: command not found
+* `$ webrat -v` = -bash: webrat: command not found
+* `$ selenium-client -v` = -bash: selenium-client: command not found
+* `$ rails -v` =
+```
+Rails is not currently installed on this system. To get the latest version, simply type:
+
+    $ sudo gem install rails
+
+You can then rerun your "rails" command.
+```
+
 ### Forward
 
 ....this book is not for....Ruby programmers. ...If you read this book, that meme will change the way you program in Java, C#, Python, or (oh God, the thought) COBOL! This book will change the way you code--period! ....You see, they've cleverly constructed the Ruby code in this book so that it can be understood by (gasp) any programmer at all! -- Robert C. Martin
