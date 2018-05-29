@@ -32,7 +32,7 @@ The one I possess is:
     - rspec-mocks 3.7.0
     - rspec-support 3.7.1
 * `$ rspec-rails -v` = -bash: rspec-rails: command not found
-* `$ gem list` = cucumber (3.1.0)
+* `$ cucumber --version` = 3.1.0
 * `$ cucumber-rails -v` = -bash: cucumber-rails: command not found
 * `$ database_cleaner -v` = -bash: database_cleaner: command not found
 * `$ webrat -v` = -bash: webrat: command not found
@@ -76,3 +76,96 @@ We believe that most of the problems that software development teams face are co
 We use `Cucumber` to describe the behaviour of application and use `RSpec` to describe the behaviour of `objects`. With the addition of a higher-level tool like `Cucumber`, we'll actually have two concentric `red/green/refactor cycles`, as depicted in Figure 1.1(`MSpec = RSpec` and `SpecFlow` = `Cucumber`):
 
 ![figure-1.1](bddcycle.jpg)
+
+### Chapter 2 Hello
+
+1. Crated file called `butler_spec.rb` with it's contents then make a directory called `spec` and move `butler_spec.rb` under it like so `spec/butler_spec`.
+
+<pre><code>
+$ <b>rspec butler_spec.rb</b>
+1 deprecation warning total
+
+Finished in 0.00889 seconds (files took 0.20208 seconds to load)
+1 example, 0 failures
+</pre></code>
+
+2. Make a directory called `features` then create a file called `butler_says_hello.feature` with it's contents and move it under `features` like so `features/butler_says_hello.feature`
+
+<pre><code>
+$ <b>cucumber features</b>
+Feature: butler says hello
+  In order to start learning RSpec and Cucumber
+  As a reader of the RSpec Book
+  I want a butler to say Hello
+
+  Scenario: butler says hello           # features/butler_says_hello.feature:7
+    Given a butler                      # features/butler_says_hello.feature:8
+    When I send it the greet message    # features/butler_says_hello.feature:9
+    Then I should see "Hello Cucumber!" # features/butler_says_hello.feature:10
+
+1 scenario (1 undefined)
+3 steps (3 undefined)
+0m0.050s
+
+You can implement step definitions for undefined steps with these snippets:
+
+Given("a butler") do
+  pending # Write code here that turns the phrase above into concrete actions
+end
+
+When("I send it the greet message") do
+  pending # Write code here that turns the phrase above into concrete actions
+end
+
+Then("I should see {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+</pre></code>
+
+3. To get the `scenario` to pass we need to store `step definitions` in a file that `Cucumber` can load. Go ahead and add a `step_definitions` directory under `features` like so `features/step_definitions`, and add a file named `butler_steps.rb` with the code snippets from above. Make sure to write code that turns the phrase above into concrete actions.
+
+4. Run the `$ cucumebr features` again:
+<pre><code>
+$ <b>cucumebr features</b>
+Feature: butler says hello
+  In order to start learning RSpec and Cucumber
+  As a reader of the RSpec Book
+  I want a butler to say Hello
+
+  Scenario: butler says hello           # features/butler_says_hello.feature:7
+    Given a butler                      # features/step_definitions/butler_steps.rb:1
+      uninitialized constant CucumberButler
+      Did you mean?  Cucumber (NameError)
+      ./features/step_definitions/butler_steps.rb:2:in `"a butler"'
+      features/butler_says_hello.feature:8:in `Given a butler'
+    When I send it the greet message    # features/step_definitions/butler_steps.rb:5
+    Then I should see "Hello Cucumber!" # features/step_definitions/butler_steps.rb:9
+
+Failing Scenarios:
+cucumber features/butler_says_hello.feature:7 # Scenario: butler says hello
+
+1 scenario (1 failed)
+3 steps (1 failed, 2 skipped)
+0m0.063s
+</pre></code>
+
+To keep it simple add the necessary code inside `features/step_definitions/butler_steps.rb` to pass all the test.
+
+5. Run the `$ cucumebr features` again:
+<pre><code>
+$ <b>cucumebr features</b>
+Feature: butler says hello
+  In order to start learning RSpec and Cucumber
+  As a reader of the RSpec Book
+  I want a butler to say Hello
+
+  Scenario: butler says hello           # features/butler_says_hello.feature:7
+    Given a butler                      # features/step_definitions/butler_steps.rb:7
+    When I send it the greet message    # features/step_definitions/butler_steps.rb:11
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch2-hello/features/step_definitions/butler_steps.rb:16:in `block in <top (required)>'.
+    Then I should see "Hello Cucumber!" # features/step_definitions/butler_steps.rb:15
+
+1 scenario (1 passed)
+3 steps (3 passed)
+0m0.047s
+</pre></code>
