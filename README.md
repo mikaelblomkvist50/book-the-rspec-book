@@ -167,10 +167,64 @@ Feature: butler says hello
   Scenario: butler says hello           # features/butler_says_hello.feature:7
     Given a butler                      # features/step_definitions/butler_steps.rb:7
     When I send it the greet message    # features/step_definitions/butler_steps.rb:11
-DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch2-hello/features/step_definitions/butler_steps.rb:16:in `block in <top (required)>'.
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new :expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch2-hello/features/step_definitions/butler_steps.rb:16:in `block in <top (required)>'.
     Then I should see "Hello Cucumber!" # features/step_definitions/butler_steps.rb:15
 
 1 scenario (1 passed)
 3 steps (3 passed)
 0m0.047s
 </pre></code>
+
+###  Chapter 3 Describing Features
+
+....The plus signs for the exact matches always come before the minus signs for the number matches and don't align with specific positions in the guess or the secret code.
+
+....We want to avoid the pitfalls of the Big Design Up Front, but we also want to do enough planning to know we're heading in the right direction. ....picking out user stories for our first iteration.
+
+....A great way to get started gathering user stories is to do a high-level brain dump of the sorts of things we might like to do. Here are some titles to get started:
+
+* Code-breaker starts game
+* Code-breaker submits guess
+* Code-breaker wins game
+* Code-breaker loses game
+* Code-breaker plays again
+* Code-breaker requests hint
+* Code-breaker saves score
+
+See how each of these is phrased as role + action? The role is the code-breaker role each time because this game has only one kind of user. In other applications, we might have several different kinds of users, in which case we want to express stories in terms of a specific role (not just a generic user), because that impacts how we think about each requirement and why we're implementing code to satisfy it.
+
+These are also high level and don't tell us much about how the system should respond to these actions. Let's take titles and generate some user stories from them.
+
+**Code-breaker starts game** The code-breaker opens a shell, types a command, and sees a welcome message and a prompt to enter the first guess.
+
+**Code-breaker submits guess** The code-breaker enters the guess, and the system replies by marking the guess according to the marking algorithm.
+
+**Code-breaker wins game** The code-breaker enters a guess that matches the secret code exactly. The system responds by marking  the guess with four + signs and a message congratulating the code-breaker on breaking the code in however many guesses it took.
+
+**Code-breaker plays again** After the game is won or lost, the system prompts the code-breaker to play again. If the code-breaker indicates yes, a new game begins. If the code-breaker indicates no, the system shuts down.
+
+**Code-breaker request hint** At any time during the game, the code-breaker can request a hint, at which point the system reveals one of the numbers in the secret code.
+
+**Code-breaker saves score** After the game is won or lost, the code-breaker can opt to save information about the game: who (initials?), how many turns, and so on.
+
+We can already see some of the challenges ahead: "according to the marking algorithm" is going to require some conversation with the stakeholders. In fact, this is where we'll spend the majority of our time both planning and developing, because the marking algorithm is where much of the complexity lies.
+
+Note the deliberate lack of detail and even some open questions. We'll get into some detail as we choose which of these stories we want to include in the release, and then we'll get more detailed in each iteration within the release. But at each phase, we want to do just enough planning to keep on moving, and no more.
+
+Now that we have some stories, let's consider them in the context of the stated goal for the initial release: to simply be able to play the game, Looking at the original list of stories, there are only two that are absolutely necessary to meet that goal:
+* Code-breaker starts game
+* Code-breaker submits guess
+
+We definitely have to be able to start the game somehow so that one is a no-brainer. Once we've started the game, if we can submit a guess and get the mark, then we can submit more guesses. As soon as we get a perfect mark, the game is won, and we hit `Ctrl + C` to stop the game and start the game back up to play again. What do you think? I agree I wouldn't add any more stories for the initial release :)
+
+....Wait, wait, wait! We're heading down a slippery slope here. Pretty soon we'll be including our entire backlog of stoires in the first release! Let's step back for a second. What is the release goal? To be able to play the game.
+
+....Given this context, we'll go with Code-breaker starts the game and Code-breaker submits guess. Together, those two stories should suffice to get us to the point where we can play the game--unless, of course, we're missing something.
+
+It turns out that there is one feature of the game that we haven't discussed yet! We won't really see the evidence of it until we submit a guess and the game marks it. Can you guess what it is? Think about how the game will be able to mark the guess. It has to mark it against something, right?
+
+The **secret code**!
+
+The game will need to generate a **secret code** that is different every time in order for it to be truly enjoyable. Now is this a user story? This is one of those grey areas that challenges the boundaries of what a user story is. Ask one experienced XPer, and you'll hear that this is really part of the **Code-breaker starts game** story based on the idea that the **secret code** should be generated when the game starts.
+
+The next person might argue it's really part of the **Code-breaker submits guess** story because that's the first time the user gets any feedback from the system that depends on the guess.
