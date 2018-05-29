@@ -20,7 +20,7 @@ The one I possess is:
 * selenium-client -1.2.18
 * rails - 3.0.0
 
-### Ruby and Gem Versions I use in [Getting Started with Rspec and Cucumebr]()
+### Ruby and Gem Versions I use in [Getting Started with Rspec and Cucumebr](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/GettingStartedWithRSpecAndCucumber.md)
 
 * `$ $ ruby -v` = ruby 2.4.1p111 (2017-03-22 revision 58053) [x86_64-darwin17]
 * `$  gem --version` = 2.6.14
