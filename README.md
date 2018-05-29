@@ -49,6 +49,8 @@ You can then rerun your "rails" command.
 [Forward](#forward) **|**
 [Chapter 1 Introduction](#chapter-1-introduction) **|**
 [Chapter 2 Hello](#chapter-2-hello) **|**
+[Chapter 3 Describing Features](#chapter-3-describing-features) **|**
+[Chapter 4  Automating Features with Cucumber](#chapter-4-automating-features-with-cucumber) **|**
 
 
 ### Forward
@@ -241,10 +243,12 @@ We're going to take third stance and make it a seperate story based on practical
 
 So, now we have our release plan with three stories. It's time to start breaking down into iterations.
 
-....Cucumber features have three parts: a title, a brief narrative, and an arbitrary number of scenarios that serve as acceptance criteria.
+....Cucumber features have three parts: a title, a brief narrative(conextra format narrative or free-form narrative), and an arbitrary number of scenarios that serve as acceptance criteria.
 
 1. Make a directory called `features` then create a new file under it called `codebreaker_starts_game.feature` so it looks like `features/codebreaker_starts_game.feature`. Copy the content of the feature, shown earlier.
 
 2. Make a directory called `support`, under `features` then create a new file called `env.rb` so it looks like `features/support/env.rb`. Even though we will leave this empty for now, `Cucumber` needs this file (or any `.rb` file) in order to know that we're using Ruby.
 
 3. Create a new file under `features` called `codebreaker_submits_guess.feature` so it looks like `features/codebreaker_submits_guess.feature`. Add Copy the content of the feature, shown earlier.
+
+### Chapter 4  Automating Features with Cucumber
