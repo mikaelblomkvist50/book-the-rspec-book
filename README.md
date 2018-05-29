@@ -228,3 +228,23 @@ The **secret code**!
 The game will need to generate a **secret code** that is different every time in order for it to be truly enjoyable. Now is this a user story? This is one of those grey areas that challenges the boundaries of what a user story is. Ask one experienced XPer, and you'll hear that this is really part of the **Code-breaker starts game** story based on the idea that the **secret code** should be generated when the game starts.
 
 The next person might argue it's really part of the **Code-breaker submits guess** story because that's the first time the user gets any feedback from the system that depends on the guess.
+
+We're going to take third stance and make it a seperate story based on practicality. ...we want to keep things small enough to accomplish in a reasonable amount of time so we can check things off the list as we go. Does that sound selfish?
+
+....Absolutely not! we're just planing! And user stories are, above all else, a planning tool. Although you can find many definitions of what a user story is and therefore must be in order to earn the title, here is a simple set of criteria that David learned from Bob Koss at Object Mentor. A user story must have the following characteristics:
+
+**Have a business value** Clearly, the game is no fun unless it generates a different secret code each time.
+
+**Be testable** That's easy. We just start up a bunch of games and ask for the code. As you'll see when we develop this part, this reveals some interesting questions about designing for testability.
+
+**Be small enough to implement in one iteration** This is the motivation for separating this story. It's guidelines that allows us to balance implementation concerns with requirements.
+
+So, now we have our release plan with three stories. It's time to start breaking down into iterations.
+
+....Cucumber features have three parts: a title, a brief narrative, and an arbitrary number of scenarios that serve as acceptance criteria.
+
+1. Make a directory called `features` then create a new file under it called `codebreaker_starts_game.feature` so it looks like `features/codebreaker_starts_game.feature`. Copy the content of the feature, shown earlier.
+
+2. Make a directory called `support`, under `features` then create a new file called `env.rb` so it looks like `features/support/env.rb`. Even though we will leave this empty for now, `Cucumber` needs this file (or any `.rb` file) in order to know that we're using Ruby.
+
+3. Create a new file under `features` called `codebreaker_submits_guess.feature` so it looks like `features/codebreaker_submits_guess.feature`. Add Copy the content of the feature, shown earlier.
