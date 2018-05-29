@@ -46,6 +46,11 @@ Rails is not currently installed on this system. To get the latest version, simp
 You can then rerun your "rails" command.
 ```
 
+[Forward](#https://github.com/mikaelblomkvist50/the-rspec-book#forward) **|**
+[Chapter 1 Introduction](#https://github.com/mikaelblomkvist50/the-rspec-book#chapter-1-introduction) **|**
+[Chapter 2 Hello](#https://github.com/mikaelblomkvist50/the-rspec-book#chapter-2-hello) **|**
+
+
 ### Forward
 
 ....this book is not for....Ruby programmers. ...If you read this book, that meme will change the way you program in Java, C#, Python, or (oh God, the thought) COBOL! This book will change the way you code--period! ....You see, they've cleverly constructed the Ruby code in this book so that it can be understood by (gasp) any programmer at all! -- Robert C. Martin
