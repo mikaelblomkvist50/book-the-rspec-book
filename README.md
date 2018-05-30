@@ -522,3 +522,18 @@ So far, all the failures we've seen have been because of exceptions and errors. 
 ### Chapter 5 Describing Code with RSepc
 
 ....we're going to use `RSpec` to `describe` behaviour at a much more granular level: the expected behaviour of insstances of the `Game` class.
+
+1. ....create a `spec` directory, with a subdirectory named `codebreaker`. Now create a file named `game_spec.rb` in `spec/codebreker/`. Add the following to `game_spec.rb`
+
+`spec/codebreker/game_spec.rb`:
+```ruby
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      it "sends a welcome message"
+      it "prompts for the first guess"
+    end
+  end
+end
+
+```
