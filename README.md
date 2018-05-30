@@ -491,7 +491,8 @@ end
 ```
 
 Now run `$ cucumber features/codebreaker_starts_game.feature` again, and this time you should see this<pre><code>
-$ <b>cucumber features/codebreaker_starts_game.feature</b>Feature: code-breaker starts game
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
 As a code-breaker
 I want to start a game
 So that I can break the code
