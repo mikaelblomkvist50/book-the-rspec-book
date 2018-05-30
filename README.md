@@ -933,3 +933,14 @@ Finished in 0.00236 seconds (files took 0.19509 seconds to load)
 </pre></code>
 
 ....Now that we have green it's time to refactor.
+
+....Martin Fowler writes, "Refactoring is the process of changing a software system in such a way that it does not alter the external behaviour of the code yet improves its internal structure."
+
+How do we know that we're not changing behaviour? We run the examples between every change. If they pass, we've refactored successfully. If any fail, we know that the very last change we made caused problem that step back to green and try again.
+
+In this case, we have a very clear break between what is context and what is behaviour, so let's take advantage of that and move the context to a block that is executed before each of the examples. Modify `game_spec.rb`.
+
+`ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
+```ruby
+
+```
