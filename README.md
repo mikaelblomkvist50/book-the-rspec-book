@@ -551,3 +551,32 @@ The `it()` method creates an `example`. Technically, it's an instance of the `Ex
 ```ruby
 require 'Codebreaker'
 ```
+
+....`spec/codebreaker/game_spec.rb` requires `spec/spec_helper.rb`, which requires  `lib/codebreaker.rb`, which in turn, requires `lib/codebreaker/game.rb`.
+
+`cd` to the `codebreaker` project root directory, and run `game_spec.rb` file with the `rspec` command like this:
+
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message (PENDING: Not yet implemented)
+    prompts for the first guess (PENDING: Not yet implemented)
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) Codebreaker::Game#start sends a welcome message
+     # Not yet implemented
+     # ./spec/codebreaker/game_spec.rb:6
+
+  2) Codebreaker::Game#start prompts for the first guess
+     # Not yet implemented
+     # ./spec/codebreaker/game_spec.rb:7
+
+
+Finished in 0.00156 seconds (files took 0.26873 seconds to load)
+2 examples, 0 failures, 2 pending
+</pre></code>
+
+The `--format doc` option tells `RSpec` to format the output using the same nesting we see in the nested describe blocks in the file.
