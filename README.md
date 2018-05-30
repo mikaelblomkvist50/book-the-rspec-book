@@ -51,6 +51,7 @@ You can then rerun your "rails" command.
 [Chapter 2 Hello](#chapter-2-hello) **|**
 [Chapter 3 Describing Features](#chapter-3-describing-features) **|**
 [Chapter 4  Automating Features with Cucumber](#chapter-4-automating-features-with-cucumber) **|**
+[Chapter 5 Describing Code with RSepc](#chapter-5-describing-code-with-rspec) **|**
 
 
 ### Forward
@@ -517,3 +518,7 @@ cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
 </pre></code>
 
 So far, all the failures we've seen have been because of exceptions and errors. We now have out first logical error, so it's time to add some behaviour to out `Game`. for that we're going to shift gears and jump over to `RSpec`.
+
+### Chapter 5 Describing Code with RSepc
+
+....we're going to use `RSpec` to `describe` behaviour at a much more granular level: the expected behaviour of insstances of the `Game` class.
