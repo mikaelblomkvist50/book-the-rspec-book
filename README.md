@@ -703,3 +703,165 @@ deprecation warnings into errors, giving you the full backtrace.
 Finished in 0.00205 seconds (files took 0.19045 seconds to load)
 2 examples, 0 failures, 1 pending
 </pre></code>
+
+We have our first passing example! We've gone from red to green. ....let's see whether we've had any impact on the features
+
+<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+      expected ["Welcome to Codebreaker!"] to include "Enter guess:" (RSpec::Expectations::ExpectationNotMetError)
+      ./features/step_definitions/codebreaker_steps.rb:25:in `"I should see {string}"'
+      features/codebreaker_starts_game.feature:11:in `And I should see 'Enter guess:''
+
+Failing Scenarios:
+cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
+
+1 scenario (1 failed)
+4 steps (1 failed, 3 passed)
+0m0.068s
+</pre></code>
+
+The following failing step is the next thing to work on: `And I should see "Enter guess:"`. Go ahead and add an example for the behaviour to `game_spec.rb`
+
+`ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
+```ruby
+require 'spec_helper'
+
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      it "sends a welcome message" do
+        output = double('output')
+        game = Game.new(output)
+
+        output.should_receive(:puts).with('Welcome to Codebreaker!')
+
+        game.start
+      end
+
+      it "prompts for the first guess" do
+        output = double('output')
+        game = Game.new(output)
+
+        output.should_receive(:puts).with('Enter guess:')
+
+        game.start
+      end
+    end
+  end
+end
+```
+
+This is very similar to the first example, but we're expecting a differnet message. We'll come back to `DRY` that up in a bit, but first let's get it passing. Run the spec and watch it fail.
+
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+Codebreaker::Game
+  #start
+    sends a welcome message
+    prompts for the first guess (FAILED - 1)
+
+Failures:
+
+  1) Codebreaker::Game#start prompts for the first guess
+     Failure/Error: game = Game.bew(output)
+
+     NoMethodError:
+       undefined method `bew' for Codebreaker::Game:Class
+       Did you mean?  new
+     # ./spec/codebreaker/game_spec.rb:17:in `block (3 levels) in <module:Codebreaker>'
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.002 seconds (files took 0.1218 seconds to load)
+2 examples, 1 failure
+
+Failed examples:
+
+rspec ./spec/codebreaker/game_spec.rb:15 # Codebreaker::Game#start prompts for the first guess
+</pre></code>
+
+`lib/codebreaker/game.rb`:
+```ruby
+module Codebreaker
+  class Game
+    def initialize(output)
+      @output = output
+    end
+
+    def start
+      @output.puts 'Welcome to Codebreaker!'
+      @output.puts 'Enter guess:'
+    end
+  end
+end
+```
+
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message (FAILED - 1)
+    prompts for the first guess (FAILED - 2)
+
+Failures:
+
+  1) Codebreaker::Game#start sends a welcome message
+     Failure/Error: @output.puts 'Enter guess:'
+
+       #<Double "output"> received :puts with unexpected arguments
+         expected: ("Welcome to Codebreaker!")
+              got: ("Enter guess:")
+     # ./lib/codebreaker/game.rb:9:in `start'
+     # ./spec/codebreaker/game_spec.rb:12:in `block (3 levels) in <module:Codebreaker>'
+
+  2) Codebreaker::Game#start prompts for the first guess
+     Failure/Error: @output.puts 'Welcome to Codebreaker!'
+
+       #<Double "output"> received :puts with unexpected arguments
+         expected: ("Enter guess:")
+              got: ("Welcome to Codebreaker!")
+     # ./lib/codebreaker/game.rb:8:in `start'
+     # ./spec/codebreaker/game_spec.rb:21:in `block (3 levels) in <module:Codebreaker>'
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.01721 seconds (files took 0.12355 seconds to load)
+2 examples, 2 failures
+
+Failed examples:
+
+rspec ./spec/codebreaker/game_spec.rb:6 # Codebreaker::Game#start sends a welcome message
+rspec ./spec/codebreaker/game_spec.rb:15 # Codebreaker::Game#start prompts for the first guess
+</pre></code>
