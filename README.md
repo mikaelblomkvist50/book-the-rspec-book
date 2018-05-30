@@ -766,6 +766,7 @@ This is very similar to the first example, but we're expecting a differnet messa
 
 <pre><code>
 $ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
 Codebreaker::Game
   #start
     sends a welcome message
@@ -774,12 +775,13 @@ Codebreaker::Game
 Failures:
 
   1) Codebreaker::Game#start prompts for the first guess
-     Failure/Error: game = Game.bew(output)
+     Failure/Error: @output.puts 'Welcome to Codebreaker!'
 
-     NoMethodError:
-       undefined method `bew' for Codebreaker::Game:Class
-       Did you mean?  new
-     # ./spec/codebreaker/game_spec.rb:17:in `block (3 levels) in <module:Codebreaker>'
+       #<Double "output"> received :puts with unexpected arguments
+         expected: ("Enter guess:")
+              got: ("Welcome to Codebreaker!")
+     # ./lib/codebreaker/game.rb:8:in `start'
+     # ./spec/codebreaker/game_spec.rb:21:in `block (3 levels) in <module:Codebreaker>'
 
 Deprecation Warnings:
 
@@ -793,7 +795,7 @@ deprecation warnings into errors, giving you the full backtrace.
 
 1 deprecation warning total
 
-Finished in 0.002 seconds (files took 0.1218 seconds to load)
+Finished in 0.03309 seconds (files took 0.18397 seconds to load)
 2 examples, 1 failure
 
 Failed examples:
@@ -857,7 +859,7 @@ deprecation warnings into errors, giving you the full backtrace.
 
 1 deprecation warning total
 
-Finished in 0.01721 seconds (files took 0.12355 seconds to load)
+Finished in 0.02637 seconds (files took 0.13237 seconds to load)
 2 examples, 2 failures
 
 Failed examples:
@@ -865,3 +867,11 @@ Failed examples:
 rspec ./spec/codebreaker/game_spec.rb:6 # Codebreaker::Game#start sends a welcome message
 rspec ./spec/codebreaker/game_spec.rb:15 # Codebreaker::Game#start prompts for the first guess
 </pre></code>
+
+And ta-da! Now not only is the second example still failing, but the first example is failing as well! Who'da funk it? This may seem a bit confusing if you've never worked with `test doubles` and `message expectations` before, but they are not all that clever. Be default, they will expect exactly what you tell them to expect, nothing more and nothing less. We're told the double in the first example to `expect puts()` with `"Welcome to Codebreaker!"` and we've satisfied that requirement, but we've only told it to expect `"Welcome to Codebreaker!" It doesn't know anything about `"Enter guess:"
+
+Similarly, the `double` in the second example expects `"Enter guess:"` but the first message it gets is "Welcome to Codebreaker!"
+
+We could combine these two into a single example, but we like to follow the guideline of `"one expectation per example"` The rationale here is that if there are two expectations in an example that should both fail given the implementation at that moment, we'll only see the first failure. No sooner do we meet that expectation than we discovered that we haven't met the second expectation. If they live in separate examples, then they'll both fail, and that will provide us with more accurate information than if only one of them is failing.
+
+We could also try to break the message up into different steps, but we've already defined how we want to talk to the `game` `object`. So how can we resolve this?
