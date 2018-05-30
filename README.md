@@ -260,7 +260,7 @@ Given("I am not yet playing") do
 end
 
 When("I start a new game") do
-  Codebreker::Game.new.start
+  Codebreaker::Game.new.start
 end
 ```
 
@@ -270,13 +270,13 @@ In my early days at Object Mentor I (David) attended a `TDD` class taught by Jam
 
 This was a galvanising moment for me.
 
-It is common to write code we wish we had doing `TDD`. We send message from the code example to an `object` that does not have a corresponding `method`. We let the Ruby interpreter tell us that the method does not exist yet (red) and then implement that method (green).
+It is common to write code we wish we had doing `TDD`. We send message from the code example to an `object` that does not have a corresponding `method`. We let the Ruby interpreter tell us that the `method` does not exist yet (red) and then implement that method (green).
 
-Doing the same thing within application code, calling the code we wish we had in one module from another module, was a different matter. It was as though an arbitrary boundary had been lifted and suddenly all of the code was my personal servant, ready and wiling to bend to my will. It didn't matter whether we were in a test or in the code being tested. What mattered was that we started from the view of the code that was going to use the new code we were about to write.
+Doing the same thing within application code, calling the code we wish we had in one `module` from another `module`, was a different matter. It was as though an arbitrary boundary had been lifted and suddenly all of the code was my personal servant, ready and wiling to bend to my will. It didn't matter whether we were in a test or in the code being tested. What mattered was that we started from the view of the code that was going to use the new code we were about to write.
 
-Over the years this has permeated my daily practise. It is very liberating , and it results in more usable APIs than I would have come up with starting with the `object` receiving the message.
+Over the years this has permeated my daily practise. It is very liberating , and it results in more usable `APIs` than I would have come up with starting with the `object` receiving the message.
 
-In retrospect, this also aligns closely with the outside-in philosophy of `BDD`, if the goal is to provide great APIs, then the best place to design them is from their consumers.
+In retrospect, this also aligns closely with the outside-in philosophy of `BDD`, if the goal is to provide great `APIs`, then the best place to design them is from their consumers.
 
 <pre><code>
 $ <b>cucumber features/codebreaker_starts_game.feature</b>
@@ -288,7 +288,7 @@ So that I can break the code
   Scenario: start game                          # features/codebreaker_starts_game.feature:7
     Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:1
     When I start a new game                     # features/step_definitions/codebreaker_steps.rb:5
-      uninitialized constant Codebreker (NameError)
+      uninitialized constant Codebreaker (NameError)
       ./features/step_definitions/codebreaker_steps.rb:6:in `"I start a new game"'
       features/codebreaker_starts_game.feature:9:in `When I start a new game'
     Then I should see 'Welcome to Codebreaker!' # features/codebreaker_starts_game.feature:10
@@ -310,7 +310,7 @@ end
 
 ....The error message tells us that we need to create a `Codebreaker` constant. It's coming from the reference to `Codebreaker::Game` in the step definition we just wrote, which also calls the `start()`, so let's go ahead and create that. Create a `lib` directory with a `codebreaker` subdirectory, and add a `game.rb` file in `lib/codebreaker` with the following:
 ```ruby
-module Codebreker
+module Codebreaker
   class Game
     def start
     end
@@ -354,3 +354,164 @@ Then("I should see {string}") do |string|
   pending # Write code here that turns the phrase above into concrete actions
 end
 </pre></code>
+
+With the second step passing, we can now move on to the `Then` steps. The last snippet is a single step definition that will handle both the `Then` and `And` steps in the scenario, passing whatever is captured by the `{string}` part to the block as the `message` parameter.
+
+As for what to write in the block, when we say **I should see "Welcome to Codebreaker!"**, we're really saying **I should see "Welcome to Codebreaker!" in the console**, and that means we need a means of capturing messages that the `Game` sends to `STDOUT`.
+
+The trick, of course, is that we're running `Cucumber` in the console, and it is already using `STDOUT`. We need a `fake object` that the `Game` thinks is `STDOUT`, but really just captures messages for us so we can set expectations about those messages.
+
+A `fake object` that pretends to be `real object` is called a `test double`. You're probably familiar with `stubs` and `mocks`. `Test double` is a generic name for them, along with `fakes`, `spies`, and so on, and so on.
+
+https://stackoverflow.com/questions/26748693/private-method-puts-cant-pass-cucumber-test-in-rspec-books-codebreaker-exam
+
+....Given that we'll use a `test double` for output, here is what we want the step definition to look like
+
+`ch4-automating-features-with-cucumber/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  Codebreker::Game.new.start
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+```
+
+Again, we're writing the code we wish we had so that we know what code to add. This line suggests that our fake objeect should have a `messages` collection. We'll also want it to have a `puts()` method that the `Game` can use.
+
+Here's what that looks like
+
+`ch4-automating-features-with-cucumber/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+class FakeOutput
+  def messages
+    @messages ||= []
+  end
+
+  def puts(message)
+    messages << message
+  end
+end
+
+def fake_output
+  @fake_output ||= FakeOutput.new
+end
+
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  Codebreker::Game.new.start
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+```
+
+The `fake_output()` method uses a caching technique called `memorization`. The first time `output()` is called, it creates a `FakeOutput`, stores in in a `@fake_output` variable, and returns it. If it gets called again, it returns the same `FakeOutput` `object`.
+
+Now we need to give the `Game` a reference to the `FakeOutput`. Modify the `When` step as follows
+
+`ch4-automating-features-with-cucumber/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+class FakeOutput
+  def messages
+    @messages ||= []
+  end
+
+  def puts(message)
+    messages << message
+  end
+end
+
+def fake_output
+  @fake_output ||= FakeOutput.new
+end
+
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  game = Codebreaker::Game.new(fake_output)
+  game.start
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+```
+
+Run `$ cucumber features/codebreaker_starts_game.feature` after making these modifications and additions to `codebreaker_steps.rb`. You should see the following output:
+<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+      wrong number of arguments (given 1, expected 0) (ArgumentError)
+      ./features/step_definitions/codebreaker_steps.rb:20:in `initialize'
+      ./features/step_definitions/codebreaker_steps.rb:20:in `new'
+      ./features/step_definitions/codebreaker_steps.rb:20:in `"I start a new game"'
+      features/codebreaker_starts_game.feature:9:in `When I start a new game'
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+Failing Scenarios:
+cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
+
+1 scenario (1 failed)
+4 steps (1 failed, 2 skipped, 1 passed)
+0m0.041s
+</pre></code>
+
+We need to modify the game to accept the `fake_output` `object` passed to a `new`
+`ch4-automating-features-with-cucumber/lib/codebreaker/game.rb`:
+```ruby
+module Codebreaker
+  class Game
+    def initialize(output)
+    end
+
+    def start
+    end
+  end
+end
+```
+
+Now run `$ cucumber features/codebreaker_starts_game.feature` again, and this time you should see this<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch4-automating-features-with-cucumber/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+      expected [] to include "Welcome to Codebreaker!" (RSpec::Expectations::ExpectationNotMetError)
+      ./features/step_definitions/codebreaker_steps.rb:25:in `"I should see {string}"'
+      features/codebreaker_starts_game.feature:10:in `Then I should see 'Welcome to Codebreaker!''
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+Failing Scenarios:
+cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
+
+1 scenario (1 failed)
+4 steps (1 failed, 1 skipped, 2 passed)
+0m0.102s
+</pre></code>
+
+So far, all the failures we've seen have been because of exceptions and errors. We now have out first logical error, so it's time to add some behaviour to out `Game`. for that we're going to shift gears and jump over to `RSpec`.
