@@ -527,6 +527,8 @@ So far, all the failures we've seen have been because of exceptions and errors. 
 
 `spec/codebreker/game_spec.rb`:
 ```ruby
+require 'spec_helper'
+
 module Codebreaker
   describe Game do
     describe "#start" do
@@ -535,5 +537,17 @@ module Codebreaker
     end
   end
 end
+```
 
+....The second statement declares a Ruby module named `Codebreaker`. This isn't necessary in order to run the specs, but it provides some conveniences. For example, we don't have to fully qualify `Game` on line 4.
+
+The `describe()` method hooks into `RSpec`'s `API` and returns a `subclass` of `RSpec::Core::ExampleGroup`. As its name suggests, this is a group of examples of the expected behaviour of an `object`.
+
+The `it()` method creates an `example`. Technically, it's an instance of the `ExampleGroup` returned by `describe()`, but you really don't need to worry about that at this point.
+
+2. Crate a file named `spec_helper.rb` in `spec`. Add the following to `spec_helper.rb`
+
+`spec/spec_helper.rb`:
+```ruby
+require 'Codebreaker'
 ```
