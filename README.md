@@ -609,3 +609,49 @@ Just as we did in the scenario, we want a test double to stand in for the real `
 The next line sets up a `message exception`: an expectation that the `output` `object` should receive the `puts` message with the string `"Welcome to Codebreaker!"` as its only argument. If it does, then the expectation will pass. If not, we'll get a failure.
 
 We send the `game` the `start` message on the last line. The intent we're expressing is that when we call `game.start`, the `output` should receive `puts("Welome to Codebreaker")`.
+
+Now we run the `rspec` command again, but this time use the `--color` flag:
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message (FAILED - 1)
+    prompts for the first guess (PENDING: Not yet implemented)
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) Codebreaker::Game#start prompts for the first guess
+     # Not yet implemented
+     # ./spec/codebreaker/game_spec.rb:14
+
+
+Failures:
+
+  1) Codebreaker::Game#start sends a welcome message
+     Failure/Error: output.should_receive(:puts).with('Welcome to Codebreaker!')
+
+       (Double "output").puts("Welcome to Codebreaker!")
+           expected: 1 time with arguments: ("Welcome to Codebreaker!")
+           received: 0 times
+     # ./spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.00243 seconds (files took 0.19568 seconds to load)
+2 examples, 1 failure, 1 pending
+
+Failed examples:
+
+rspec ./spec/codebreaker/game_spec.rb:6 # Codebreaker::Game#start sends a welcome message
+</pre></code>
