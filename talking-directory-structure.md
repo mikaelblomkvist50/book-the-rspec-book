@@ -2,7 +2,11 @@
 
 Many coding technical books I've encountered seem to talk about the `directory structure` that will be used in the project covered through out the book. As well as other available `directory structures` you may encounter in the open source/industry. Hence I've dedicated a file to highlight/outline the `directory structure` demonstrated in this book. Who knows maybe by documenting this fo each book I complete, I'll start to notice a pattern, or even see benefits or maybe criticism.
 
+---
+
 To get going, create a `spec` directory, with a subdirectory named `code-breaker`. Now create a file named `game_spec.rb` in `spec/codebreaker/`. As we progress, we'll maintain  parallel structure like this in which source file (for example, `lib/codebreaker/game.rb`) has a parallel spec file (for exmaple, `spec/codebreaker/game.rb`). -- *"The RSpec Book" Version: 2011-4-7, The Pragmatic Programmers (Chapter 5. Describing Code with RSpec)*
+
+---
 
 Perhaps you're heard that a `one-to-one mapping` between `objects` and their specs is a `BDD` no-no. There is some truth to this, but the devil is in the details.
 
