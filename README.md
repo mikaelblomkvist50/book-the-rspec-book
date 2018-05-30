@@ -580,3 +580,32 @@ Finished in 0.00156 seconds (files took 0.26873 seconds to load)
 </pre></code>
 
 The `--format doc` option tells `RSpec` to format the output using the same nesting we see in the nested describe blocks in the file.
+
+In `game_spec.rb`, we want to do what we've done in the feature: specify that when we start the game, it sends the right messages to the output. Start by modifying `game_spec.rb` as follows
+
+`ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
+```ruby
+require 'spec_helper'
+
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      it "sends a welcome message" do
+        output = double('output')
+        game = Game.new(output)
+
+        output.should_receive(:puts).with('Welcome to Codebreaker!')
+
+        game.start
+      end
+      it "prompts for the first guess"
+    end
+  end
+end
+```
+
+Just as we did in the scenario, we want a test double to stand in for the real `STDOUT`. Instead of rolling our own as we did in the scenario, however, we're using `RSpec`'s dynamic test double framework, `RSpec::Mock`, to create dynamic test double on the first line of the example.
+
+The next line sets up a `message exception`: an expectation that the `output` `object` should receive the `puts` message with the string `"Welcome to Codebreaker!"` as its only argument. If it does, then the expectation will pass. If not, we'll get a failure.
+
+We send the `game` the `start` message on the last line. The intent we're expressing is that when we call `game.start`, the `output` should receive `puts("Welome to Codebreaker")`.
