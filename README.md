@@ -306,7 +306,7 @@ You can implement step definitions for undefined steps with these snippets:
 Then("I should see {string}") do |string|
   pending # Write code here that turns the phrase above into concrete actions
 end
-</pre><code>
+</pre></code>
 
 ....The error message tells us that we need to create a `Codebreaker` constant. It's coming from the reference to `Codebreaker::Game` in the step definition we just wrote, which also calls the `start()`, so let's go ahead and create that. Create a `lib` directory with a `codebreaker` subdirectory, and add a `game.rb` file in `lib/codebreaker` with the following:
 ```ruby
