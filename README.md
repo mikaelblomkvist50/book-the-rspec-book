@@ -875,3 +875,61 @@ Similarly, the `double` in the second example expects `"Enter guess:"` but the f
 We could combine these two into a single example, but we like to follow the guideline of `"one expectation per example"` The rationale here is that if there are two expectations in an example that should both fail given the implementation at that moment, we'll only see the first failure. No sooner do we meet that expectation than we discovered that we haven't met the second expectation. If they live in separate examples, then they'll both fail, and that will provide us with more accurate information than if only one of them is failing.
 
 We could also try to break the message up into different steps, but we've already defined how we want to talk to the `game` `object`. So how can we resolve this?
+
+There are a couple of ways we can go about it, but the simplest way is to tell the `double output` to only listen for the messages we tell it to expect and ignore any other messages. This is based on the `Null Object design` pattern described in Pattern Languages of Program Design 3 and is supported by `RSpec`'s double framework with the `as_null_object()` `method`.
+
+`ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
+```ruby
+require 'spec_helper'
+
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      it "sends a welcome message" do
+        output = double('output').as_null_object
+        game = Game.new(output)
+
+        output.should_receive(:puts).with('Welcome to Codebreaker!')
+
+        game.start
+      end
+
+      it "prompts for the first guess" do
+        output = double('output').as_null_object
+        game = Game.new(output)
+
+        output.should_receive(:puts).with('Enter guess:')
+
+        game.start
+      end
+    end
+  end
+end
+```
+
+Run the `rspec` command again, and you should see this:
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message
+    prompts for the first guess
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.00236 seconds (files took 0.19509 seconds to load)
+2 examples, 0 failures
+</pre></code>
+
+....Now that we have green it's time to refactor.
