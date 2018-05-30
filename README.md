@@ -476,7 +476,8 @@ cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
 0m0.041s
 </pre></code>
 
-We need to modify the game to accept the `fake_output` `object` passed to a `new`
+We need to modify the game to accept the `fake_output` `object` passed to `new`
+
 `ch4-automating-features-with-cucumber/lib/codebreaker/game.rb`:
 ```ruby
 module Codebreaker
