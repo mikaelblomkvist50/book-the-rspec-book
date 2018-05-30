@@ -252,3 +252,105 @@ So, now we have our release plan with three stories. It's time to start breaking
 3. Create a new file under `features` called `codebreaker_submits_guess.feature` so it looks like `features/codebreaker_submits_guess.feature`. Add Copy the content of the feature, shown earlier.
 
 ### Chapter 4  Automating Features with Cucumber
+
+`ch4-automating-features-with-cucumber/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  Codebreker::Game.new.start
+end
+```
+
+At this point, we don't have any application code, so we're just writing the code we wish we had. We want to keep it simple, and this is about as simple as it can get.
+
+In my early days at Object Mentor I (David) attended a `TDD` class taught by James Grenning. He was refactoring an existing method, and he wrote a statement that called a `method` that didn't exist yet, saying "start by writing the code you wish you had".
+
+This was a galvanising moment for me.
+
+It is common to write code we wish we had doing `TDD`. We send message from the code example to an `object` that does not have a corresponding `method`. We let the Ruby interpreter tell us that the method does not exist yet (red) and then implement that method (green).
+
+Doing the same thing within application code, calling the code we wish we had in one module from another module, was a different matter. It was as though an arbitrary boundary had been lifted and suddenly all of the code was my personal servant, ready and wiling to bend to my will. It didn't matter whether we were in a test or in the code being tested. What mattered was that we started from the view of the code that was going to use the new code we were about to write.
+
+Over the years this has permeated my daily practise. It is very liberating , and it results in more usable APIs than I would have come up with starting with the `object` receiving the message.
+
+In retrospect, this also aligns closely with the outside-in philosophy of `BDD`, if the goal is to provide great APIs, then the best place to design them is from their consumers.
+
+<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:1
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:5
+      uninitialized constant Codebreker (NameError)
+      ./features/step_definitions/codebreaker_steps.rb:6:in `"I start a new game"'
+      features/codebreaker_starts_game.feature:9:in `When I start a new game'
+    Then I should see 'Welcome to Codebreaker!' # features/codebreaker_starts_game.feature:10
+    And I should see 'Enter guess:'             # features/codebreaker_starts_game.feature:11
+
+Failing Scenarios:
+cucumber features/codebreaker_starts_game.feature:7 # Scenario: start game
+
+1 scenario (1 failed)
+4 steps (1 failed, 2 undefined, 1 passed)
+0m0.030s
+
+You can implement step definitions for undefined steps with these snippets:
+
+Then("I should see {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+</pre><code>
+
+....The error message tells us that we need to create a `Codebreaker` constant. It's coming from the reference to `Codebreaker::Game` in the step definition we just wrote, which also calls the `start()`, so let's go ahead and create that. Create a `lib` directory with a `codebreaker` subdirectory, and add a `game.rb` file in `lib/codebreaker` with the following:
+```ruby
+module Codebreker
+  class Game
+    def start
+    end
+  end
+end
+```
+
+....The conventional approach to this is to have a file in the `lib` directory named for the top-level module of the app. In our case, that's `codebreaker.rb` Create that file now with the following:
+```ruby
+require 'codebreaker/game'
+```
+
+Now add the following to `features/support/env.rb`:
+```ruby
+$LOAD_PATH << File.expand_path('../../../lib', __FILE__)
+require 'codebreaker'
+```
+
+Cucumber will load `features/support/env.rb`, which now requires `lib/codebreaker.rb`, which, in turn, requires `lib/codebreaker/game.rb`, which is where we defined the `Codebreaker` module with the `Game` with an empty `start()` method. If you now run `$ cucumber features/codebreaker_starts_game.feature`, you should see some different results:
+
+<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:1
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:5
+    Then I should see 'Welcome to Codebreaker!' # features/codebreaker_starts_game.feature:10
+    And I should see 'Enter guess:'             # features/codebreaker_starts_game.feature:11
+
+1 scenario (1 undefined)
+4 steps (2 undefined, 2 passed)
+0m0.024s
+
+You can implement step definitions for undefined steps with these snippets:
+
+Then("I should see {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+</pre></code>
