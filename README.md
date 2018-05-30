@@ -549,7 +549,7 @@ The `it()` method creates an `example`. Technically, it's an instance of the `Ex
 
 `spec/spec_helper.rb`:
 ```ruby
-require 'Codebreaker'
+require 'codebreaker'
 ```
 
 ....`spec/codebreaker/game_spec.rb` requires `spec/spec_helper.rb`, which requires  `lib/codebreaker.rb`, which in turn, requires `lib/codebreaker/game.rb`.
@@ -654,4 +654,52 @@ Finished in 0.00243 seconds (files took 0.19568 seconds to load)
 Failed examples:
 
 rspec ./spec/codebreaker/game_spec.rb:6 # Codebreaker::Game#start sends a welcome message
+</pre></code>
+
+The summary at the bottom of the output tells us we have one failure and one pending example. ....The failure message tells us that `output` never received `puts`. Here's what we need to do to get this example to pass:
+`lib/codebreaker/game.rb`:
+```ruby
+module Codebreaker
+  class Game
+    def initialize(output)
+      @output = output
+    end
+
+    def start
+      @output.puts 'Welcome to Codebreaker!'
+    end
+  end
+end
+```
+
+Make thos changes and run `rspec` command again, and you should see this:
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message
+    prompts for the first guess (PENDING: Not yet implemented)
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) Codebreaker::Game#start prompts for the first guess
+     # Not yet implemented
+     # ./spec/codebreaker/game_spec.rb:14
+
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.00205 seconds (files took 0.19045 seconds to load)
+2 examples, 0 failures, 1 pending
 </pre></code>
