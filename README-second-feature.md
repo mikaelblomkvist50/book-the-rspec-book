@@ -1,9 +1,8 @@
 ###  Chapter 6 Adding New Features
 
-Run `cucumber features/codebreaker_submits_guess.feature`
+Run `cucumber features/codebreaker_submits_guess.feature`:
 
-<pre><code>
-$ <b>cucumber features/codebreaker_submits_guess.feature</b>
+```
 Feature: code-breaker submits guess
   The code-breaker submits a guess of four numbers. The game marks the guess with + and - signs.
 
@@ -60,10 +59,9 @@ end
 Then("the mark should be {string}") do |string|
   pending # Write code here that turns the phrase above into concrete actions
 end
-</pre></code>
+```
 
 ....As we saw earlier, the output includes the contents of the file listed previously, plus a summary and code snippets for any undefined steps. Here is the summary and just a few of the code snippets:
-
 ```
 14 scenarios (14 undefined)
 42 steps (42 undefined)
@@ -132,8 +130,7 @@ end
 
 Now run `cucumber features/codebreaker_submits_guess.feature` again, and you'll see output including this:
 
-<pre><code>
-$ <b>cucumber features/codebreaker_submits_guess.feature</b>
+```
 Feature: code-breaker submits guess
   The code-breaker submits a guess of four numbers. The game marks the guess with + and - signs.
 
@@ -167,6 +164,6 @@ Feature: code-breaker submits guess
       ./features/step_definitions/codebreaker_steps.rb:30:in `"the secret code is {string}"'
       features/codebreaker_submits_guess.feature:19:in `Given the secret code is "1234"'
       features/codebreaker_submits_guess.feature:8:in `Given the secret code is "<code>"'
-</pre></code>
+```
 
 You should see the `ArgumentError` for every scenario. This is actualluy good news, becasue the error tells us that everything is wired up correctly, and we know what we have to do next: get the `start()` method on `Game` to accept the secret code as an argument.
