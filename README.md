@@ -942,5 +942,127 @@ In this case, we have a very clear break between what is context and what is beh
 
 `ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
 ```ruby
+require 'spec_helper'
 
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      before(:each) do
+        @output = double('output').as_null_object
+        @game = Game.new(@output)
+      end
+
+      it "sends a welcome message" do
+        @output.should_receive(:puts).with('Welcome to Codebreaker!')
+        @game.start
+      end
+
+      it "prompts for the first guess" do
+        @output.should_receive(:puts).with('Enter guess:')
+        @game.start
+      end
+    end
+  end
+end
 ```
+
+Just as you might expect from reading this, the block passed to `before(:each)` will be run before each example. The before block and the example are executed in the same `object`, so they have access to the same instance variables.
+
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message
+    prompts for the first guess
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:12:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.00221 seconds (files took 0.12305 seconds to load)
+2 examples, 0 failures
+</pre></code>
+
+Adding all of those `@` symbols can be tedious and error prone, so `RSpec` offers an alternative approach.
+
+When the code in a `before` block is only creating `instance variables` and assigning them values, which is most of the time, we can use `RSpec`'s `let()` method instead. `let()` takes a symbol representing a method name and a block, which represents the implementation of that `method`.
+
+`ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb`:
+```ruby
+require 'spec_helper'
+
+module Codebreaker
+  describe Game do
+    describe "#start" do
+      let(:output) { double('output').as_null_object }
+      let(:game)   { Game.new(output) }
+
+      it "sends a welcome message" do
+        output.should_receive(:puts).with('Welcome to Codebreaker!')
+        game.start
+      end
+
+      it "prompts for the first guess" do
+        output.should_receive(:puts).with('Enter guess:')
+        game.start
+      end
+    end
+  end
+end
+```
+
+<pre><code>
+$ <b>rspec spec/codebreaker/game_spec.rb --color --format doc</b>
+
+Codebreaker::Game
+  #start
+    sends a welcome message
+    prompts for the first guess
+
+Deprecation Warnings:
+
+Using `should_receive` from rspec-mocks' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/spec/codebreaker/game_spec.rb:10:in `block (3 levels) in <module:Codebreaker>'.
+
+
+If you need more of the backtrace for any of these deprecations to
+identify where to make the necessary changes, you can configure
+`config.raise_errors_for_deprecations!`, and it will turn the
+deprecation warnings into errors, giving you the full backtrace.
+
+1 deprecation warning total
+
+Finished in 0.00415 seconds (files took 0.16234 seconds to load)
+2 examples, 0 failures
+</pre></code>
+
+The first call to `let()` defines a memorized `output()` method that returns a `double` `object`. Memorized means that the first time the method is invoked, the return value is `cached` and that same value is returned every subsequesnt time the method is invoked within the same scope. That fact doesn't affect our current example, but it will come in handy a bit later.
+
+Now run the feature again.
+
+<pre><code>
+$ <b>cucumber features/codebreaker_starts_game.feature</b>
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch5-describing-code-with-rspec/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+1 scenario (1 passed)
+4 steps (4 passed)
+0m0.034s
+</pre></code>
