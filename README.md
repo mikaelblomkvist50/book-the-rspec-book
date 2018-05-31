@@ -1066,3 +1066,27 @@ DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax withou
 4 steps (4 passed)
 0m0.034s
 </pre></code>
+
+....now we have our first passing code examples and our first passing feature. There were a lot of steps to get there, but in practise this all really takes just a few minutes, even with all the wiring and `require` statements.
+
+We've also set up quite a bit of infrastructure. You'll see, as we move along, that there is is and less new material need to add more features, code examples, and application code. It just builds gradually on what we've already developed.
+
+Now that we have a passing feature, it would be nice to see it in action. For that, we'll need to create and execute a simple script. Create a `bin` in the project root directory, and add a `bin/codebreaker` file. If you're on a `*nix` system, enter this code in that file:
+
+`bin/codebreaker`:
+```ruby
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'codebreaker'
+
+game = Codebreaker::Game.new(STDOUT)
+game.start
+```
+
+If you're on `*nix`, now run `chmod+x bin/codebreaker` so we can execute it and then run this:
+
+<pre><code>
+$ <b>bin/codebreaker</b>
+Welcome to Codebreaker!
+Enter guess:
+</pre></code>
