@@ -26,6 +26,14 @@ Then("I should see {string}") do |string|
 end
 
 Given("the secret code is {string}") do |string|
-  game = Codebreaker::Game.new(fake_output)
-  game.start(string)
+  @game = Codebreaker::Game.new(fake_output)
+  @game.start(string)
+end
+
+When("I guess {string}") do |string|
+  @game.guess(string)
+end
+
+Then("the mark should be {string}") do |string|
+  fake_output.messages.should include(string)
 end

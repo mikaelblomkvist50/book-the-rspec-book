@@ -416,3 +416,321 @@ end
 ```
 
 Now all the specs should be passing, and all the scenarios are either passing or undefined.
+
+We still have 28 steps undefined, but we now have 14 passing steps in `codebreaker_submits_guess.feature`. These are all the `Given` steps. Remember, each row in the tables represents a separate scenario. Until we get to the point where the failures are logical failures, as opposed to runtime errors due to structural discrepancies, a small change is likely to impact all of the scenario at once.
+
+The remaining undefined steps are the `When` steps that actually submit the guess and the `Then` steps that set the expectations that the game should mark the guess. Copy the snippet for the `When` step
+```ruby
+When("I guess {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+```
+
+into `codebreaker_steps.rb`, and modify it as follows
+```ruby
+class FakeOutput
+  def messages
+    @messages ||= []
+  end
+
+  def puts(message)
+    messages << message
+  end
+end
+
+def fake_output
+  @fake_output ||= FakeOutput.new
+end
+
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  game = Codebreaker::Game.new(fake_output)
+  game.start('1234')
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+
+Given("the secret code is {string}") do |string|
+  game = Codebreaker::Game.new(fake_output)
+  game.start(string)
+end
+
+When("I guess {string}") do |string|
+  @game.guess(string)
+end
+```
+
+Similar to the `Given` step, we capture the guess in the regular expression and pass it on to the `Game`, this time via the `guess()` method. This new step is expecting `@game` instance variables, so modify the `Given` as follows
+
+
+`ch6-adding-new-features/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+class FakeOutput
+  def messages
+    @messages ||= []
+  end
+
+  def puts(message)
+    messages << message
+  end
+end
+
+def fake_output
+  @fake_output ||= FakeOutput.new
+end
+
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  game = Codebreaker::Game.new(fake_output)
+  game.start('1234')
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+
+Given("the secret code is {string}") do |string|
+  @game = Codebreaker::Game.new(fake_output)
+  @game.start(string)
+end
+
+When("I guess {string}") do |string|
+  @game.guess(string)
+end
+```
+
+Run this feature again `$ cucumber`, and you'll see this in the output:
+```
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch6-adding-new-features/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+Feature: code-breaker submits guess
+  The code-breaker submits a guess of four numbers. The game marks the guess with + and - signs.
+
+  For each number in the guess that matches the number and position of a number in the secret code, the mark includes one + sign. For each number in the guess that matches the number but not the position of a number in the secret code, the mark includes one - sign.
+
+  Scenario Outline: submit guess      # features/codebreaker_submits_guess.feature:7
+    Given the secret code is "<code>" # features/codebreaker_submits_guess.feature:8
+    When I guess "<guess>"            # features/codebreaker_submits_guess.feature:9
+    Then the mark should be "<mark>"  # features/codebreaker_submits_guess.feature:10
+
+    Scenarios: no matches
+      | code | guess | mark |
+      | 1234 | 5555  |      |
+      undefined method `guess' for #<Codebreaker::Game:0x007ffb7802b540> (NoMethodError)
+      ./features/step_definitions/codebreaker_steps.rb:34:in `"I guess {string}"'
+      features/codebreaker_submits_guess.feature:14:in `When I guess "5555"'
+      features/codebreaker_submits_guess.feature:9:in `When I guess "<guess>"'
+
+    Scenarios: 1 number correct
+      | code | guess | mark |
+      | 1234 | 1555  | +    |
+      undefined method `guess' for #<Codebreaker::Game:0x007ffb779d8698> (NoMethodError)
+      ./features/step_definitions/codebreaker_steps.rb:34:in `"I guess {string}"'
+      features/codebreaker_submits_guess.feature:18:in `When I guess "1555"'
+      features/codebreaker_submits_guess.feature:9:in `When I guess "<guess>"'
+      | 1234 | 2555  | -    |
+      undefined method `guess' for #<Codebreaker::Game:0x007ffb779e8c78> (NoMethodError)
+      ./features/step_definitions/codebreaker_steps.rb:34:in `"I guess {string}"'
+      features/codebreaker_submits_guess.feature:19:in `When I guess "2555"'
+      features/codebreaker_submits_guess.feature:9:in `When I guess "<guess>"'
+```
+
+We wrote the code we wish we had, but we don't have it! The `Game` has no `guess()` method, so we'll need to add one.
+
+`ch6-adding-new-features/lib/codebreaker/game.rb`:
+```ruby
+module Codebreaker
+  class Game
+    def initialize(output)
+      @output = output
+    end
+
+    def start(secret)
+      @output.puts 'Welcome to Codebreaker!'
+      @output.puts 'Enter guess:'
+    end
+
+    def guess(guess)
+    end
+  end
+end
+```
+
+Now run the scenarios `cucumber`:
+```
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch6-adding-new-features/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+Feature: code-breaker submits guess
+  The code-breaker submits a guess of four numbers. The game marks the guess with + and - signs.
+
+  For each number in the guess that matches the number and position of a number in the secret code, the mark includes one + sign. For each number in the guess that matches the number but not the position of a number in the secret code, the mark includes one - sign.
+
+  Scenario Outline: submit guess      # features/codebreaker_submits_guess.feature:7
+    Given the secret code is "<code>" # features/codebreaker_submits_guess.feature:8
+    When I guess "<guess>"            # features/codebreaker_submits_guess.feature:9
+    Then the mark should be "<mark>"  # features/codebreaker_submits_guess.feature:10
+
+    Scenarios: no matches
+      | code | guess | mark |
+      | 1234 | 5555  |      |
+
+    Scenarios: 1 number correct
+      | code | guess | mark |
+      | 1234 | 1555  | +    |
+      | 1234 | 2555  | -    |
+
+    Scenarios: 2 numbers correct
+      | code | guess | mark |
+      | 1234 | 5254  | ++   |
+      | 1234 | 5154  | +-   |
+      | 1234 | 2545  | --   |
+
+    Scenarios: 3 numbers correct
+      | code | guess | mark |
+      | 1234 | 5234  | +++  |
+      | 1234 | 5134  | ++-  |
+      | 1234 | 5124  | +--  |
+      | 1234 | 5123  | ---  |
+
+    Scenarios: all numbers correct
+      | code | guess | mark |
+      | 1234 | 1234  | ++++ |
+      | 1234 | 1243  | ++-- |
+      | 1234 | 1423  | +--- |
+      | 1234 | 4321  | ---- |
+
+15 scenarios (14 undefined, 1 passed)
+46 steps (14 undefined, 32 passed)
+0m0.115s
+
+You can implement step definitions for undefined steps with these snippets:
+
+Then("the mark should be {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+```
+
+Again, there are no failures, but now there are only 14 steps undefined. These are the `Then` steps. Copy the last snippet
+```ruby
+Then("the mark should be {string}") do |string|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+```
+
+to `ch6-adding-new-features/features/step_definitions/codebreaker_steps.rb`:
+```ruby
+class FakeOutput
+  def messages
+    @messages ||= []
+  end
+
+  def puts(message)
+    messages << message
+  end
+end
+
+def fake_output
+  @fake_output ||= FakeOutput.new
+end
+
+Given("I am not yet playing") do
+
+end
+
+When("I start a new game") do
+  game = Codebreaker::Game.new(fake_output)
+  game.start('1234')
+end
+
+Then("I should see {string}") do |string|
+  fake_output.messages.should include(string)
+end
+
+Given("the secret code is {string}") do |string|
+  @game = Codebreaker::Game.new(fake_output)
+  @game.start(string)
+end
+
+When("I guess {string}") do |string|
+  @game.guess(string)
+end
+
+Then("the mark should be {string}") do |string|
+  fake_output.messages.should include(string)
+end
+```
+
+Now run the scenarios again `$ cucumeber`, and you should see this:
+```
+Feature: code-breaker starts game
+As a code-breaker
+I want to start a game
+So that I can break the code
+
+  Scenario: start game                          # features/codebreaker_starts_game.feature:7
+    Given I am not yet playing                  # features/step_definitions/codebreaker_steps.rb:15
+    When I start a new game                     # features/step_definitions/codebreaker_steps.rb:19
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /Users/mikaelblomkvist/the-rspec-book/GettingStartedWithRSpecAndCucumber/ch6-adding-new-features/features/step_definitions/codebreaker_steps.rb:25:in `block in <top (required)>'.
+    Then I should see 'Welcome to Codebreaker!' # features/step_definitions/codebreaker_steps.rb:24
+    And I should see 'Enter guess:'             # features/step_definitions/codebreaker_steps.rb:24
+
+Feature: code-breaker submits guess
+  The code-breaker submits a guess of four numbers. The game marks the guess with + and - signs.
+
+  For each number in the guess that matches the number and position of a number in the secret code, the mark includes one + sign. For each number in the guess that matches the number but not the position of a number in the secret code, the mark includes one - sign.
+
+  Scenario Outline: submit guess      # features/codebreaker_submits_guess.feature:7
+    Given the secret code is "<code>" # features/codebreaker_submits_guess.feature:8
+    When I guess "<guess>"            # features/codebreaker_submits_guess.feature:9
+    Then the mark should be "<mark>"  # features/codebreaker_submits_guess.feature:10
+
+    Scenarios: no matches
+      | code | guess | mark |
+      | 1234 | 5555  |      |
+      expected ["Welcome to Codebreaker!", "Enter guess:"] to include "" (RSpec::Expectations::ExpectationNotMetError)
+      ./features/step_definitions/codebreaker_steps.rb:38:in `"the mark should be {string}"'
+      features/codebreaker_submits_guess.feature:14:in `Then the mark should be ""'
+      features/codebreaker_submits_guess.feature:10:in `Then the mark should be "<mark>"'
+
+    Scenarios: 1 number correct
+      | code | guess | mark |
+      | 1234 | 1555  | +    |
+      expected ["Welcome to Codebreaker!", "Enter guess:"] to include "+" (RSpec::Expectations::ExpectationNotMetError)
+      ./features/step_definitions/codebreaker_steps.rb:38:in `"the mark should be {string}"'
+      features/codebreaker_submits_guess.feature:18:in `Then the mark should be "+"'
+      features/codebreaker_submits_guess.feature:10:in `Then the mark should be "<mark>"'
+      | 1234 | 2555  | -    |
+      expected ["Welcome to Codebreaker!", "Enter guess:"] to include "-" (RSpec::Expectations::ExpectationNotMetError)
+      ./features/step_definitions/codebreaker_steps.rb:38:in `"the mark should be {string}"'
+      features/codebreaker_submits_guess.feature:19:in `Then the mark should be "-"'
+      features/codebreaker_submits_guess.feature:10:in `Then the mark should be "<mark>"'
+```
+
+Fantastic! Instead of an exception or structural error, we're getting a logical failure on the `Then` step. Even though this is happening in all 14 scenarios, this is good news because we know that we have all the step definitions we need and everything is wired up correctly. Now it's time to drill down to `RSpec` and drive out the solution with isolated code examples.
