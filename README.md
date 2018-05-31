@@ -55,9 +55,9 @@ You can then rerun your "rails" command.
 
 `README-first-feature.md:`
 
-[Chapter 3 Describing Features](#chapter-3-describing-features) **|**
-[Chapter 4  Automating Features with Cucumber](#chapter-4-automating-features-with-cucumber) **|**
-[Chapter 5 Describing Code with RSepc](#chapter-5-describing-code-with-rspec) **|**
+[Chapter 3 Describing Features](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/README-first-feature.md#chapter-3-describing-features) **|**
+[Chapter 4  Automating Features with Cucumber](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/README-first-feature.md#chapter-4--automating-features-with-cucumber) **|**
+[Chapter 5 Describing Code with RSepc](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/README-first-feature.md#chapter-5-describing-code-with-rsepc) **|**
 
 `README-.md`:
 

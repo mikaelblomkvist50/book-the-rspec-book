@@ -236,7 +236,7 @@ Then("I should see {string}") do |string|
 end
 ```
 
-The `fake_output()` method uses a caching technique called `memorization`. The first time `output()` is called, it creates a `FakeOutput`, stores in in a `@fake_output` variable, and returns it. If it gets called again, it returns the same `FakeOutput` `object`.
+The `fake_output()` method uses a caching technique called `memorization`. The first time `fake_output()` is called, it creates a `FakeOutput`, stores in in a `@fake_output` variable, and returns it. If it gets called again, it returns the same `FakeOutput` `object`.
 
 Now we need to give the `Game` a reference to the `FakeOutput`. Modify the `When` step as follows
 
