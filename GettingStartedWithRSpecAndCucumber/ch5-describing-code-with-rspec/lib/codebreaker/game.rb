@@ -1,9 +1,7 @@
 module Codebreaker
   class Game
     def initialize(output) #output=> #<IO:<STDOUT>>
-      binding.pry
       @output = output #@output=> #<IO:<STDOUT>>
-      binding.pry
     end
 
     def start
