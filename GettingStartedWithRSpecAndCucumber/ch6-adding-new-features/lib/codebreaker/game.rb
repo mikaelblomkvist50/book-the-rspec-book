@@ -1,12 +1,12 @@
 module Codebreaker
   class Game
-    def initialize(output) #output=> #<IO:<STDOUT>>
-      @output = output #@output=> #<IO:<STDOUT>>
+    def initialize(output)
+      @output = output
     end
 
-    def start
-      @output.puts 'Welcome to Codebreaker!' #=> STDOUT.puts 'Welcome to Codebraeker!'
-      @output.puts 'Enter guess:' #=> STDOUT.puts 'Enter guess:'
+    def start(secret)
+      @output.puts 'Welcome to Codebreaker!'
+      @output.puts 'Enter guess:'
     end
   end
 end
