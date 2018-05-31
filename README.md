@@ -59,7 +59,10 @@ You can then rerun your "rails" command.
 [Chapter 4  Automating Features with Cucumber](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/README-first-feature.md#chapter-4--automating-features-with-cucumber) **|**
 [Chapter 5 Describing Code with RSepc](https://github.com/mikaelblomkvist50/the-rspec-book/blob/master/README-first-feature.md#chapter-5-describing-code-with-rsepc) **|**
 
-`README-.md`:
+`README-second-feature.md`:
+
+[Chapter 6 Adding New Features]() **|**
+[Chapter 7 ]() **|**
 
 
 ### Forward

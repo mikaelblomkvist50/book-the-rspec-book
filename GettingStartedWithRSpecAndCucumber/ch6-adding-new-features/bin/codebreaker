@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'pry'
+require 'codebreaker'
+
+game = Codebreaker::Game.new(STDOUT) #=> #<Codebreaker::Game:0x007fe1149e7210 @output=#<IO:<STDOUT>>>
+game.start #=> #<Codebreaker::Game:0x007fe1149e7210 @output=#<IO:<STDOUT>>>
